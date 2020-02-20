@@ -21,11 +21,14 @@ install:
   - pip install tox-travis pytest-django-queries
   - git clone https://github.com/NyanKiyoshi/pytest-django-queries-ci-tools.git --depth 1 ../queries-ci-tools
   - >
+    TEMPLATES_MD5_BEFORE=$(tar -cf - templates | md5sum);
     if [ -n "$DJANGO" ]; then
       nvm install 10 \
         && npm i \
         && npm run build-emails
-    fi
+    fi;
+    TEMPLATES_MD5_AFTER=$(tar -cf - templates | md5sum);
+    [ "$TEMPLATES_MD5_BEFORE" != "$TEMPLATES_MD5_AFTER" ] && travis_terminate 1;
 
 script:
   - tox
